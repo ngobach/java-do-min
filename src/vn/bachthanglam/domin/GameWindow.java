@@ -3,8 +3,7 @@ package vn.bachthanglam.domin;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import javax.swing.*;
 /**
  * Lớp GameWindow
@@ -16,6 +15,10 @@ public class GameWindow extends JFrame {
      * Kích thước và số mìn của bản đồ
      */
     private final int size, mines;
+    /**
+     * Cấp độ khó của game
+     */
+    private final String level;
     /**
      * JLabel đếm số bom còn lại chưa được cắm cờ
      */
@@ -36,6 +39,11 @@ public class GameWindow extends JFrame {
      * Biến kiểm tra trạng thái của game đã kết thúc hay chưa
      */
     private boolean gameEnded;
+    /**
+     * Bộ đếm thời gian
+     */
+    private JLabel counterLabel;
+    private Counter counter;
     
     /**
      * Hàm khởi tạo GameWindow
@@ -43,10 +51,11 @@ public class GameWindow extends JFrame {
      * @param mines     Số mìn trong bản đồ game
      * @throws HeadlessException 
      */
-    private GameWindow(int size, int mines) throws HeadlessException {
+    private GameWindow(int size, int mines, String level) throws HeadlessException {
         super("Dò mìn!");
         this.size = size;
         this.mines = mines;
+        this.level = level;
         init();
     }
     
@@ -55,8 +64,8 @@ public class GameWindow extends JFrame {
      * 
      * @return đối tượng GameWindow được xây dựng
      */
-    public static GameWindow createGameWindow(int size, int mines) {
-        return new GameWindow(size, mines);
+    public static GameWindow createGameWindow(int size, int mines, String level) {
+        return new GameWindow(size, mines, level);
     }
     
     /**
@@ -107,7 +116,75 @@ public class GameWindow extends JFrame {
             }
         }
         // Đẩy gameboard vào container
-        container.add(gameBoard);
+        container.add(gameBoard, BorderLayout.CENTER);
+        
+        // Bộ đếm thời gian
+        counterLabel = new JLabel("000");
+        counterLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 24));
+        counterLabel.setForeground(Color.BLUE);
+        counterLabel.setHorizontalAlignment(JLabel.CENTER);
+        container.add(counterLabel, BorderLayout.SOUTH);
+        
+        // Khởi tạo menubar
+        JMenuBar menubar = new JMenuBar();
+        JMenu menu = new JMenu("Trò chơi");
+        menu.add(new JMenuItem("Hướng dẫn") {
+            {
+                addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JOptionPane.showMessageDialog(null, "<html>" +
+                                "<b>Chuột phải:</b> Cắm/Gỡ cờ<br>" + 
+                                "<b>Chuột trái:</b> mở ô<br>" + 
+                                "<i>Mỗi ô có đánh số là số lượng ô bom chung đỉnh với ô đó<br>" +
+                                "Hoặc là ô chứa bom hoặc nếu ô đó không chung đỉnh với<br>" + 
+                                "bất kỳ ô bom nào thì 8 ô xung quanh sẽ được lật mở</i>" +
+                                "</html>");
+                    }
+                });
+            }
+        });
+        menu.add(new JMenuItem("Giới thiệu") {
+            {
+                addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JOptionPane.showMessageDialog(null, "<html>" +
+                                "<b color='red'>Game dò mìn Java</b><br>" +
+                                "Nhóm sinh viên thực hiện:<br>" + 
+                                "&bull; <i>Ngô Xuân Bách</i><br>" +
+                                "&bull; <i>Đào Quang Thắng</i><br>" +
+                                "&bull; <i>Vũ Văn Lâm</i><br><br>" +
+                                "Chúng em chân thành cảm ơn thầy <b>Vũ Đức Minh</b> đã giúp đỡ thực hiện đề tài này!" +
+                                "</html>");
+                    }
+                });
+            }
+        });
+        menu.add(new JMenuItem("Điểm cao") {
+            {
+                addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        HighScore.getHighScore(level).show();
+                    }
+                });
+            }
+        });
+        
+        menu.add(new JSeparator());
+        menu.add(new JMenuItem("Kết thúc") {
+            {
+                addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.exit(0);
+                    }
+                });
+            }
+        });
+        menubar.add(menu);
+        setJMenuBar(menubar);
         
         // Thiết lập kích thước và các tùy chỉnh khác cho JFrame
         getContentPane().add(container);
@@ -118,7 +195,9 @@ public class GameWindow extends JFrame {
         
         // Hiển thị Form
         setVisible(true);
-        
+        // Counter
+        counter = new Counter();
+        counter.start();
         // Bắt đầu 1 game mới
         newGame();
     }
@@ -189,6 +268,7 @@ public class GameWindow extends JFrame {
         gameEnded = false;
         // Số ô chưa mở chính bằng kích thước bản đồ trừ đi số mìn
         cellLeft = size*size - mines;
+        counter.reset();
     }
 
     /**
@@ -242,6 +322,8 @@ public class GameWindow extends JFrame {
         if (cellLeft == 0) {
             flagCounter.setText("Thắng!");
             gameEnded = true;
+            // TODO: scored
+            HighScore.getHighScore(level).scored(counter.getScore());
         }
     }
 
@@ -257,6 +339,14 @@ public class GameWindow extends JFrame {
                 gb.reveal();
             }
         }
+    }
+
+    /**
+     * Hàm sự kiện đóng cửa sổ
+     * Hủy đồng hồ đếm
+     */
+    public void onClose() {
+        
     }
 
     /**
@@ -297,7 +387,34 @@ public class GameWindow extends JFrame {
                 flagCounter.setText(String.valueOf(flagLeft));
             }
         }
+    }
+    
+    private class Counter extends Thread {
+        private boolean stopped = false;
+        private long start;
+        public void stopCounter() {
+            stopped = true;
+        }
+        @Override
+        public void run() {
+            start = System.currentTimeMillis();
+            while (!stopped) {
+                if (!gameEnded){
+                    counterLabel.setText(String.valueOf(getScore()));
+                }
+                try{
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {}
+            }
+        }
         
+        public int getScore() {
+            return (int) ((System.currentTimeMillis() - start)/1000);
+        }
+        
+        public void reset() {
+            start = System.currentTimeMillis();
+        }
     }
 }
 

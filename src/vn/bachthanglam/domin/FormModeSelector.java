@@ -73,9 +73,9 @@ public class FormModeSelector extends JFrame implements ActionListener {
         label.setForeground(Color.BLACK);
         label.setHorizontalAlignment(JLabel.CENTER);
         panel.add(label);
-        panel.add(new GameModeButton("Dễ", 9, 10, this));
-        panel.add(new GameModeButton("Trung Bình", 16, 40,this));
-        panel.add(new GameModeButton("Khó", 24, 99, this));
+        panel.add(new GameModeButton("Dễ","ez", 9, 10, this));
+        panel.add(new GameModeButton("Trung Bình","medium", 16, 40,this));
+        panel.add(new GameModeButton("Khó","godlike", 24, 99, this));
         panel.add(new JLabel("<html><center>Game được xây dựng bởi<br><b>Ngô Xuân Bách</b>, <b>Đào Quang Thắng</b> và <b>Vũ Văn Lâm</b></center></html>"));
         panel.setBorder(new EmptyBorder(210,60,50,60));
         
@@ -107,7 +107,7 @@ public class FormModeSelector extends JFrame implements ActionListener {
         // Kiểm tra xem GameModeButton nào được click
         GameModeButton btn = (GameModeButton) e.getSource();
         // Xây dựng GameWindow
-        GameWindow game = GameWindow.createGameWindow(btn.size, btn.mines);
+        final GameWindow game = GameWindow.createGameWindow(btn.size, btn.mines, btn.level);
         // Hiển thị GameWindow
         game.setVisible(true);
         // Ẩn form này đi
@@ -117,6 +117,7 @@ public class FormModeSelector extends JFrame implements ActionListener {
         game.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                game.onClose();
                 setVisible(true);
             }
         });

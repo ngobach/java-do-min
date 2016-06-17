@@ -24,18 +24,24 @@ class GameModeButton extends JButton {
      * Biến chứa số mìn
      */
     public int mines;
-
+    /**
+     * Biến cấp độ khó
+     */
+    public String level;
+    
     /**
      * Hàm Khởi tạo
      * @param text      Văn bản hiển thị của JButton
+     * @param level     Mức độ khó
      * @param size      Kích thước mong muốn của game
      * @param mines     Số mìn trong game
      * @param listener  Đối tượng lắng nghe sự kiện click của JButton
      */
-    public GameModeButton(String text, int size, int mines, ActionListener listener) {
+    public GameModeButton(String text,String level, int size, int mines, ActionListener listener) {
         super(text);
         this.size = size;
         this.mines = mines;
+        this.level = level;
         
         // Thay đổi font, kích thước, thêm đối tượng lắng nghe sự kiện
         addActionListener(listener);
