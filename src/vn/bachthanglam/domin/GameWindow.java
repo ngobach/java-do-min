@@ -322,7 +322,6 @@ public class GameWindow extends JFrame {
         if (cellLeft == 0) {
             flagCounter.setText("Thắng!");
             gameEnded = true;
-            // TODO: scored
             HighScore.getHighScore(level).scored(counter.getScore());
         }
     }

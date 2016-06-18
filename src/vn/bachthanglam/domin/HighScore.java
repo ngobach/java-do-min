@@ -2,8 +2,7 @@ package vn.bachthanglam.domin;
 
 import java.io.*;
 import java.util.*;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 
@@ -14,11 +13,19 @@ public class HighScore {
     private final String level;
     private List<Score> scores;
     
-    
+    /**
+     * Hàm trả về Obj HighScore tương ứng với level
+     * @param level cấp độ khó
+     * @return      HighScore
+     */
     public static HighScore getHighScore(String level) {
         return new HighScore(level);
     }
     
+    /**
+     * Hàm Khởi tạo đối tượng HighScore
+     * @param level cấp độ khó
+     */
     private HighScore(String level){
         this.level = level;
         scores = new ArrayList<>();
@@ -42,10 +49,15 @@ public class HighScore {
         }
     }
     
+    /**
+     * Hàm ghi nhận kết quả 
+     * @param score điểm số của game
+     */
     public void scored(int score) {
+        // Kiểm tra xem đã có đủ tối đa 5 Điểm cao hoặc là điểm này thuộc 
+        // Top điểm cao thì ghi vào file
         if (scores.size() < 5 || score < scores.get(4).score) {
-            // It's new high score
-            // add to file
+            // Ghi vào file
             String name = JOptionPane.showInputDialog(null, "Nhập tên của bạn", "Điểm cao", JOptionPane.INFORMATION_MESSAGE);
             if (name == null) name = "UNNAMED";
             
