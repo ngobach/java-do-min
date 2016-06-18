@@ -345,7 +345,7 @@ public class GameWindow extends JFrame {
      * Hủy đồng hồ đếm
      */
     public void onClose() {
-        
+        counter.stopCounter();
     }
 
     /**
@@ -388,12 +388,22 @@ public class GameWindow extends JFrame {
         }
     }
     
+    /**
+     * Lớp bộ đếm thời gian
+     * Tính điểm người chơi
+     */
     private class Counter extends Thread {
         private boolean stopped = false;
         private long start;
+        
+        /**
+         * Hàm dừng bộ đếm
+         * Sử dụng khi kết thúc GameWindow
+         */
         public void stopCounter() {
             stopped = true;
         }
+        
         @Override
         public void run() {
             start = System.currentTimeMillis();
@@ -407,10 +417,17 @@ public class GameWindow extends JFrame {
             }
         }
         
+        /**
+         * Hàm lấy điểm hiện tại của người chơi
+         * @return điểm người chơi
+         */
         public int getScore() {
             return (int) ((System.currentTimeMillis() - start)/1000);
         }
         
+        /**
+         * Hàm reset đồng hồ đếm
+         */
         public void reset() {
             start = System.currentTimeMillis();
         }
