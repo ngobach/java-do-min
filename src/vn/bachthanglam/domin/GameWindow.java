@@ -155,7 +155,6 @@ public class GameWindow extends JFrame {
                                 "&bull; <i>Ngô Xuân Bách</i><br>" +
                                 "&bull; <i>Đào Quang Thắng</i><br>" +
                                 "&bull; <i>Vũ Văn Lâm</i><br><br>" +
-                                "Chúng em chân thành cảm ơn thầy <b>Vũ Đức Minh</b> đã giúp đỡ thực hiện đề tài này!" +
                                 "</html>");
                     }
                 });
